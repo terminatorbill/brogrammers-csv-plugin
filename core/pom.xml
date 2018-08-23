@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>core</artifactId>
-    <version>${project.version}</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
     <name>brogrammers-csv-core</name>
