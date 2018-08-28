@@ -1,13 +1,11 @@
 package com.brogrammers.it;
 
+import static com.brogrammers.utilities.Reflections.runGetter;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.Set;
@@ -46,37 +44,16 @@ public class CsvWriterIT {
     @Test
     public void should_create_given_csv_and_write_data_with_correct_data_types() {
         //given
-        TestModel testModel = new TestModel("foo", "bar", 500L, 100);
-        CsvWriter<TestModel> csvWriter = new CsvWriter<>(Paths.get("src/test/resources/output.csv"), Charsets.UTF_8, Lists.newArrayList(testModel));
+        TestModel testModel1 = new TestModel("foo", "bar", 500L, 100);
+        TestModel testModel2 = new TestModel("baz", "boom", 3000L, 500);
+        CsvWriter<TestModel> csvWriter = new CsvWriter<>(Paths.get("src/test/resources/output.csv"), Charsets.UTF_8, Lists.newArrayList(testModel1, testModel2));
 
         //when
         csvWriter.write();
 
         //then
-    }
 
-
-    private static Object runGetter(Field field, TestModel testModel) {
-        for (Method method : ReflectionUtils.getAllMethods(testModel.getClass())) {
-            if (isGet(field, method) || isIs(field, method)) {
-                if (method.getName().toLowerCase().endsWith(field.getName().toLowerCase())) {
-                    try {
-                        return method.invoke(testModel);
-                    }
-                    catch (IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    private static boolean isGet(Field field, Method method) {
-        return method.getName().startsWith("get") && method.getName().length() == (field.getName().length() + 3);
-    }
-
-    private static boolean isIs(Field field, Method method) {
-        return method.getName().startsWith("is") && method.getName().length() == (field.getName().length() + 2);
+        //For now since the reader is not yet ready I don't have anything automated to assert that the correct contents have been written.
+        assertEquals(1L, 1L);
     }
 }

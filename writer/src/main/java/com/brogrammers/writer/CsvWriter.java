@@ -1,12 +1,11 @@
 package com.brogrammers.writer;
 
+import static com.brogrammers.utilities.Reflections.runGetter;
+
+import java.io.BufferedWriter;
 import java.io.Closeable;
-import java.io.Flushable;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,15 +17,14 @@ import java.util.Set;
 
 import org.reflections.ReflectionUtils;
 
-public class CsvWriter<T> implements Closeable, Flushable {
+public class CsvWriter<T> implements Closeable {
 
     private static final String DEFAULT_FIELD_DELIMITER = ",";
-    private static final String DEFAULT_LINE_SEPARATOR =  System.lineSeparator();
     private boolean newLine = false;
+    private BufferedWriter writer;
     private final Path path;
     private final Charset charset;
     private final List<T> content;
-    private final OutputStreamWriter writer;
 
     public CsvWriter(Path path, Charset charset, List<T> content) {
         this.path = Objects.requireNonNull(path);
@@ -34,10 +32,7 @@ public class CsvWriter<T> implements Closeable, Flushable {
         this.content = Objects.requireNonNull(content);
 
         try {
-            this.writer = new OutputStreamWriter(
-                    Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING),
-                    charset
-            );
+            this.writer = Files.newBufferedWriter(path, charset, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -52,13 +47,8 @@ public class CsvWriter<T> implements Closeable, Flushable {
         }
     }
 
-    @Override
-    public void flush() {
-        try {
-            writer.flush();
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+    public void setWriter(BufferedWriter writer) {
+        this.writer = writer;
     }
 
     public void write() {
@@ -66,6 +56,7 @@ public class CsvWriter<T> implements Closeable, Flushable {
             newLine = (index != content.size() - 1 || index > 0);
             try {
                 write(content.get(index));
+                writer.flush();
             } catch (IOException e) {
                 throw new IllegalStateException(e);
             }
@@ -78,7 +69,7 @@ public class CsvWriter<T> implements Closeable, Flushable {
         Iterator<Field> iterator = fields.iterator();
 
         if (newLine) {
-            writer.write(DEFAULT_LINE_SEPARATOR);
+            writer.newLine();
         }
         boolean isLastField = false;
         while (iterator.hasNext()) {
@@ -87,34 +78,10 @@ public class CsvWriter<T> implements Closeable, Flushable {
                 isLastField = true;
             }
 
-            writer.write(runGetter(field, content).toString());
+            writer.append(runGetter(field, content).toString());
             if (!isLastField) {
-                writer.write(DEFAULT_FIELD_DELIMITER);
+                writer.append(DEFAULT_FIELD_DELIMITER);
             }
         }
-    }
-
-    private static <T> Object runGetter(Field field, T content) {
-        for (Method method : ReflectionUtils.getAllMethods(content.getClass())) {
-            if (isGet(field, method) || isIs(field, method)) {
-                if (method.getName().toLowerCase().endsWith(field.getName().toLowerCase())) {
-                    try {
-                        return method.invoke(content);
-                    }
-                    catch (IllegalAccessException | InvocationTargetException e) {
-                        throw new IllegalStateException(e);
-                    }
-                }
-            }
-        }
-        throw new IllegalAccessError();
-    }
-
-    private static boolean isGet(Field field, Method method) {
-        return method.getName().startsWith("get") && method.getName().length() == (field.getName().length() + 3);
-    }
-
-    private static boolean isIs(Field field, Method method) {
-        return method.getName().startsWith("is") && method.getName().length() == (field.getName().length() + 2);
     }
 }
