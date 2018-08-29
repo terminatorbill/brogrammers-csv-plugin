@@ -46,6 +46,7 @@ public class CsvWriterIT {
         //given
         TestModel testModel1 = new TestModel("foo", "bar", 500L, 100);
         TestModel testModel2 = new TestModel("baz", "boom", 3000L, 500);
+
         CsvWriter<TestModel> csvWriter = new CsvWriter<>(Paths.get("src/test/resources/output.csv"), Charsets.UTF_8, Lists.newArrayList(testModel1, testModel2));
 
         //when

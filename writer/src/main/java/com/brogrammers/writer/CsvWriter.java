@@ -53,7 +53,7 @@ public class CsvWriter<T> implements Closeable {
 
     public void write() {
         for (int index = 0; index < content.size(); index++) {
-            newLine = (index != content.size() - 1 || index > 0);
+            newLine = index > 0;
             try {
                 write(content.get(index));
                 writer.flush();
