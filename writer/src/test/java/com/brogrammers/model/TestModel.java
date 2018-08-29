@@ -1,4 +1,4 @@
-package com.brogrammers.it.model;
+package com.brogrammers.model;
 
 public class TestModel {
     private final String firstName;
