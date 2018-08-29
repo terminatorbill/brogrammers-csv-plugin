@@ -11,6 +11,15 @@ public final class Reflections {
 
     }
 
+    /**
+     * Searches and invokes through reflection the correct getter method
+     * for the provided {@link Field} object.
+     * @param field The field to search for the appropriate public getter
+     * @param content The object on which we use reflection
+     * @param <T>
+     * @return The type of the public getter of the field
+     * @throws IllegalAccessError if either no appropriate public getter is found or no method at all.
+     */
     public static <T> Object runGetter(Field field, T content) {
         for (Method method : ReflectionUtils.getAllMethods(content.getClass())) {
             if (isGet(field, method) || isIs(field, method)) {
