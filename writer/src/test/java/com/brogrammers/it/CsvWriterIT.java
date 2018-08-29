@@ -5,7 +5,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.Set;
@@ -47,14 +51,24 @@ public class CsvWriterIT {
         TestModel testModel1 = new TestModel("foo", "bar", 500L, 100);
         TestModel testModel2 = new TestModel("baz", "boom", 3000L, 500);
 
-        CsvWriter<TestModel> csvWriter = new CsvWriter<>(Paths.get("src/test/resources/output.csv"), Charsets.UTF_8, Lists.newArrayList(testModel1, testModel2));
+        Writer writer = createWriter();
+
+        CsvWriter<TestModel> csvWriter = CsvWriter.create(writer);
 
         //when
-        csvWriter.write();
+        csvWriter.write(Lists.newArrayList(testModel1, testModel2));
 
         //then
 
         //For now since the reader is not yet ready I don't have anything automated to assert that the correct contents have been written.
         assertEquals(1L, 1L);
+    }
+
+    private BufferedWriter createWriter() {
+        try {
+            return Files.newBufferedWriter(Paths.get("src/test/resources/output.csv"), Charsets.UTF_8);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

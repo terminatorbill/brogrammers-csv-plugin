@@ -2,17 +2,12 @@ package com.brogrammers.writer;
 
 import static com.brogrammers.utilities.Reflections.runGetter;
 
-import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.Field;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import org.reflections.ReflectionUtils;
@@ -21,21 +16,10 @@ public class CsvWriter<T> implements Closeable {
 
     private static final String DEFAULT_FIELD_DELIMITER = ",";
     private boolean newLine = false;
-    private BufferedWriter writer;
-    private final Path path;
-    private final Charset charset;
-    private final List<T> content;
+    private Writer writer;
 
-    public CsvWriter(Path path, Charset charset, List<T> content) {
-        this.path = Objects.requireNonNull(path);
-        this.charset = Objects.requireNonNull(charset);
-        this.content = Objects.requireNonNull(content);
-
-        try {
-            this.writer = Files.newBufferedWriter(path, charset, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+    public static <T> CsvWriter<T> create(Writer writer) {
+        return new CsvWriter<>(writer);
     }
 
     @Override
@@ -47,11 +31,11 @@ public class CsvWriter<T> implements Closeable {
         }
     }
 
-    public void setWriter(BufferedWriter writer) {
+    private CsvWriter(Writer writer) {
         this.writer = writer;
     }
 
-    public void write() {
+    public void write(List<T> content) {
         for (int index = 0; index < content.size(); index++) {
             newLine = index > 0;
             try {
@@ -69,7 +53,7 @@ public class CsvWriter<T> implements Closeable {
         Iterator<Field> iterator = fields.iterator();
 
         if (newLine) {
-            writer.newLine();
+            writer.append(System.lineSeparator());
         }
         boolean isLastField = false;
         while (iterator.hasNext()) {
