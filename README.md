@@ -35,3 +35,7 @@
 
 **Package Application:**
 - <code>mvn clean package</code>
+
+**Debug unit tests with maven**
+- <code>mvn -Dmaven.surefire.debug test</code>
+- Attach a debugger listening to port 5005
