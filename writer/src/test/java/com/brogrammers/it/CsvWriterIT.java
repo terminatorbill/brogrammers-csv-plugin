@@ -25,7 +25,7 @@ public class CsvWriterIT {
 
         Writer writer = createWriter();
 
-        CsvWriter<TestModel> csvWriter = CsvWriter.create(writer);
+        CsvWriter<TestModel> csvWriter = CsvWriter.newInstance(writer);
 
         //when
         csvWriter.write(Lists.newArrayList(testModel1, testModel2));

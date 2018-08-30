@@ -19,7 +19,7 @@ public class CsvWriter<T> implements Closeable {
     private boolean newLine = false;
     private Writer writer;
 
-    public static <T> CsvWriter<T> create(Writer writer) {
+    public static <T> CsvWriter<T> newInstance(Writer writer) {
         return new CsvWriter<>(writer);
     }
 
@@ -34,6 +34,7 @@ public class CsvWriter<T> implements Closeable {
 
     public void write(List<T> content) {
         for (int index = 0; index < content.size(); index++) {
+            //Only add a new line when there is more than one element in the contents to write
             newLine = index > 0;
             try {
                 write(content.get(index));

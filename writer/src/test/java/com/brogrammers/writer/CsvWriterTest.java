@@ -34,7 +34,7 @@ public class CsvWriterTest {
                 new TestModel("baz", "foob", 5000L, 300)
         );
 
-        CsvWriter<TestModel> csvWriter = CsvWriter.create(writter);
+        CsvWriter<TestModel> csvWriter = CsvWriter.newInstance(writter);
 
         //when
         csvWriter.write(content);
@@ -50,7 +50,7 @@ public class CsvWriterTest {
     @Test
     public void should_close_the_given_writer() throws IOException {
         //given
-        CsvWriter<TestModel> csvWriter = CsvWriter.create(writter);
+        CsvWriter<TestModel> csvWriter = CsvWriter.newInstance(writter);
 
         //when
         csvWriter.close();
@@ -62,7 +62,7 @@ public class CsvWriterTest {
     @Test(expected = IllegalStateException.class)
     public void should_throw_IllegalStateException_when_IOException_is_thrown_in_close() throws IOException {
         //given
-        CsvWriter<TestModel> csvWriter = CsvWriter.create(writter);
+        CsvWriter<TestModel> csvWriter = CsvWriter.newInstance(writter);
         doThrow(new IOException()).when(writter).close();
 
         //when
@@ -76,7 +76,7 @@ public class CsvWriterTest {
                 new TestModel("foo", "bar", 100L, 50),
                 new TestModel("baz", "foob", 5000L, 300)
         );
-        CsvWriter<TestModel> csvWriter = CsvWriter.create(writter);
+        CsvWriter<TestModel> csvWriter = CsvWriter.newInstance(writter);
         doThrow(new IOException()).when(writter).append(any(String.class));
 
         //when
@@ -85,6 +85,6 @@ public class CsvWriterTest {
 
     @Test(expected = NullPointerException.class)
     public void should_throw_NullPointerException_when_given_writer_is_null() {
-        CsvWriter.create(null);
+        CsvWriter.newInstance(null);
     }
 }
