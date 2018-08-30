@@ -2,7 +2,6 @@ package com.brogrammers.writer;
 
 import static com.brogrammers.utilities.Reflections.runGetter;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Field;
@@ -13,7 +12,7 @@ import java.util.Set;
 
 import org.reflections.ReflectionUtils;
 
-public class CsvWriter<T> implements Closeable {
+public class CsvWriter<T> implements AutoCloseable {
 
     private static final String DEFAULT_FIELD_DELIMITER = ",";
     private boolean newLine = false;
